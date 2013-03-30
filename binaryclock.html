@@ -1,0 +1,384 @@
+<!--
+
+The source in this document is provided AS-IS without warrenty, guarantee or any implied merchantability or the like thereof
+
+Use of the source is subject to the Creative Commons Attribution-ShareAlike 2.5 License;
+this license entitles you to modify and create derivative works, and inclusion in commersial products
+provided the source uses the same license and you mention the original author (me!). 
+For futher information please visit the Creative Commons at http://www.creativecommons.org
+
+conditions of using source:
+
+1) you must mention me as the original author, and provide my website as a method of contact
+
+2) you must use the Creative Commons license upon which this source was provided to you (Creative Commons Attribution-ShareAlike 2.5 License)
+
+thats it!
+
+author: Sean Nicholls
+website: http://www.seannicholls.com/about
+
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Binary Clock provided by Sean Nicholls</title>
+	
+	<!--
+	
+		The style sheet is required for the program to work correctly
+		it will still do the same processing, turning lights on/off etc
+		but they wont make sense if not placed correctly. This stylesheet
+		ensures that the lights are positioned correctly. 
+		
+		Feel free to mess around with the settings, using diffferent images,
+		adding background colours, borders etc.
+	
+	-->
+	<style type="text/css">
+		
+		.binaryClock
+		{
+			display: block;
+			width: 276px;
+			height: 200px;
+		}
+	
+		.binar
+		{
+			width: 36px;
+			height: 36px;
+			background-image: url(binar_off.jpg);
+			margin: 5px;
+		}
+	
+		.binar_empty
+		{
+			width: 36px;
+			height: 36px;
+			margin: 5px;
+		}
+		
+		.binar_on
+		{
+			width: 36px;
+			height: 36px;
+			background-image: url(binar_on.jpg);
+			margin: 5px;
+			display: none;		
+		}
+		
+		.binarCol
+		{
+			float:left;
+		}
+		
+		.binarHead
+		{
+			width: 92px;
+			height: 16px;
+			text-align:center;
+			float:left;
+			font: 16px Verdana, Arial, Helvetica, sans-serif;
+			margin-top margin-bottom: 5px;
+		}
+	
+	</style>
+	<script type="text/javascript">
+	
+		// declare variables
+		var curtime = new Date();
+		var hour = curtime.getHours();
+		var minute = curtime.getMinutes();
+		var second = curtime.getSeconds();
+		
+		// start the timer
+		var timepasses = setInterval( "second_passed()" , 1000 );
+	
+		// called every second
+		function second_passed()
+		{
+		
+			curtime = new Date();
+			
+			hour = curtime.getHours();
+			minute = curtime.getMinutes();
+			second = curtime.getSeconds();
+			
+			validate();
+						
+		}
+		
+		// redraws binary time elements (binars)
+		function validate()
+		{
+			document.title = ( "The binary time is " + hour + ":" + minute + ":" + second );
+			
+			// redraw (show) digits
+			for( var i = 0; i <= 5; i++ )
+				updateCell(i);			
+						
+		}
+		
+		// update cell
+		function updateCell(index)
+		{		
+		
+			var offset;
+			var len;
+			var pos;
+			var isBigNum;
+			var time;
+			
+			switch( index )				// this could probably be made more efficient, maybe with a loop or other complex logic?
+			{
+				case 0:
+					offset = 0;
+					len = 2;
+					isBigNum = true;
+					time = hour;
+					break;
+					
+				case 1:
+					offset = 2;
+					len = 4;
+					isBigNum = false;
+					time = hour;
+					break;
+					
+				case 2:
+					offset = 6;
+					len = 3;
+					isBigNum = true;
+					time = minute;
+					break;
+					
+				case 3:
+					offset = 9;
+					len = 4;
+					isBigNum = false;
+					time = minute;
+					break;
+					
+				case 4:
+					offset = 13;
+					len = 3;
+					isBigNum = true;
+					time = second;
+					break;
+					
+				case 5:
+					offset = 16;
+					len = 4;
+					isBigNum = false;
+					time = second;
+					break;
+				
+			}
+			
+			if(isBigNum)
+			{
+				pos = (time - (time % 10)) / 10;
+			}
+			else
+			{
+				pos = (time % 10);
+			}		
+			
+			
+			for( var i = 0; i < len; i++ )			// clear all digits to an off state	
+				editDigit(offset+i, false);
+			
+			switch( pos )							// someone clever should be able to make this into a loop
+			{
+				case 0:
+					// nothing
+					break;
+					
+				
+				case 1:
+					editDigit(offset, true);				
+					break;
+					
+				
+				case 2:
+					editDigit(offset+1, true);
+					break;
+					
+				
+				case 3:
+					editDigit(offset, true);
+					editDigit(offset+1, true);
+					break;
+					
+				
+				case 4:
+					editDigit(offset+2, true);
+					break;
+					
+				
+				case 5:
+					editDigit(offset, true);
+					editDigit(offset+2, true);
+					break;
+					
+				
+				case 6:
+					editDigit(offset+1, true);
+					editDigit(offset+2, true);
+					break;
+					
+				
+				case 7:
+					editDigit(offset, true);
+					editDigit(offset+1, true);
+					editDigit(offset+2, true);
+					break;
+					
+				
+				case 8:
+					editDigit(offset+3, true);
+					break;
+					
+				
+				case 9:
+					editDigit(offset, true);
+					editDigit(offset+3, true);
+					break;
+				
+			}
+			
+		}
+		
+		// turn a digit on or off
+		function editDigit(index, mode)
+		{			
+			var elm = document.getElementById("b" + index);
+			var elm2 = document.getElementById("d" + index);
+			
+			if(mode)		// on
+			{
+				elm.style.display = "none";
+				elm2.style.display = "block";
+			}
+			else			// off
+			{
+				elm.style.display = "block";
+				elm2.style.display = "none";
+			}
+		}
+		
+		// clear all digits
+		function clearAll()
+		{
+			var elm;
+			var elm2;
+		
+			for( var i = 0; i<=19; i++ )
+			{				
+				elm = document.getElementById("b" + i);
+				elm2 = document.getElementById("d" + i);
+				
+				elm.style.display = "block";
+				elm2.style.display = "none";
+			}
+		}
+	
+	</script>
+</head>
+<body>
+
+	<!-- 
+	
+	take a close look at how the digits are aligned,
+	to work with the javascript provided, the digits
+	must be placed in reverse-numeric order.
+	
+	take for example column no 2, below:
+	
+	the id's start at b5 & d5 then decrement downard
+	towards  b2 & d2.
+	
+	If you reversed this, it makes the clock even more
+	difficult to read. This isnt necessarily a bad
+	thing, but I was going for as close a resemblence
+	to the ThinkGeek clocks as possible, in software
+	form.
+	
+	-->
+	
+	<!-- BEGIN "BinaryClock" -->
+	<div class="binaryClock">
+		<div class="binarCol">
+			<div class="binar_empty"></div>
+			<div class="binar_empty"></div>
+			<div class="binar" id="b1"></div>
+			<div class="binar_on" id="d1"></div>
+			<div class="binar" id="b0"></div>
+			<div class="binar_on" id="d0"></div>
+		</div>
+		<div class="binarCol">
+			<div class="binar" id="b5"></div>
+			<div class="binar_on" id="d5"></div>
+			<div class="binar" id="b4"></div>
+			<div class="binar_on" id="d4"></div>
+			<div class="binar" id="b3"></div>
+			<div class="binar_on" id="d3"></div>
+			<div class="binar" id="b2"></div>
+			<div class="binar_on" id="d2"></div>
+		</div>
+		<div class="binarCol">
+			<div class="binar_empty"></div>
+			<div class="binar" id="b8"></div>
+			<div class="binar_on" id="d8"></div>
+			<div class="binar" id="b7"></div>
+			<div class="binar_on" id="d7"></div>
+			<div class="binar" id="b6"></div>
+			<div class="binar_on" id="d6"></div>
+		</div>
+		<div class="binarCol">
+			<div class="binar" id="b12"></div>
+			<div class="binar_on" id="d12"></div>
+			<div class="binar" id="b11"></div>
+			<div class="binar_on" id="d11"></div>
+			<div class="binar" id="b10"></div>
+			<div class="binar_on" id="d10"></div>
+			<div class="binar" id="b9"></div>
+			<div class="binar_on" id="d9"></div>
+		</div>
+		<div class="binarCol">
+			<div class="binar_empty"></div>
+			<div class="binar" id="b15"></div>
+			<div class="binar_on" id="d15"></div>
+			<div class="binar" id="b14"></div>
+			<div class="binar_on" id="d14"></div>
+			<div class="binar" id="b13"></div>
+			<div class="binar_on" id="d13"></div>
+		</div>
+		<div class="binarCol">
+			<div class="binar" id="b19"></div>
+			<div class="binar_on" id="d19"></div>
+			<div class="binar" id="b18"></div>
+			<div class="binar_on" id="d18"></div>
+			<div class="binar" id="b17"></div>
+			<div class="binar_on" id="d17"></div>
+			<div class="binar" id="b16"></div>
+			<div class="binar_on" id="d16"></div>
+		</div>
+		<div class="binarHead">Hour</div>
+		<div class="binarHead">Minute</div>
+		<div class="binarHead">Second</div>
+	</div>
+	<!-- END "BinaryClock" -->
+	
+	<h1>BinaryClock</h1>
+	<p>This binary clock was created using xHTML and Javascript.</p>
+	<p>It was inspired by the <a href="http://www.thinkgeek.com/homeoffice/lights/59e0/">binary clocks</a> sold at <a href="http://www.thinkgeek.com/">ThinkGeek</a>. If you like this, you can buy the real thing from &quot;ThinkGeek Inc. - stuff for smart masses&quot;</p>
+	<h1>Notes</h1>
+	<p>The binary clock is not perfect, it wont work on all systems, and is not as efficient as it could possibly be, so if you have any comments, queries or suggestions, <a href="http://www.seannicholls.com/about/contact" title="contact me">contact me</a></p>	
+	<h1>Copyright</h1>
+	<p>The source code, and attached images, are provided under the Creative Commons Attribution-ShareAlike 2.5 License</p>
+</body>
+</html>
